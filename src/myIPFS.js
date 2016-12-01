@@ -1,8 +1,12 @@
-const OrbitDB = require('orbit-db');
-const IPFS = require('ipfs-daemon');
-let userID = 5;
-const ipfsOptions = {
-  IpfsDataDir: '/tmp/' + 6,
+'use strict'
+
+const IpfsDaemon = require('ipfs-daemon')
+const OrbitDB = require('orbit-db')
+
+const userId = Math.floor(Math.random() * 1000)
+
+const conf = {
+  IpfsDataDir: '/tmp/' + userId,
   Addresses: {
     API: '/ip4/127.0.0.1/tcp/0',
     Swarm: ['/ip4/0.0.0.0/tcp/0'],
@@ -10,41 +14,37 @@ const ipfsOptions = {
   },
 }
 
-const ipfs = new IPFS(ipfsOptions);
 console.log("Starting...")
 
+const ipfs = new IpfsDaemon(conf)
+
+ipfs.on('error', (err) => console.error(err))
+
 ipfs.on('ready', () => {
-    console.log("ready")
-    const orbitdb = new OrbitDB(ipfs)
-    console.log("orbit ready")
-    const db = orbitdb.kvstore("|orbit-db|examples|kvstores")
-    console.log("db ready")
-    const creatures = ['🐙', '🐬', '🐋', '🐠', '🐡', '🦀', '🐢', '🐟', '🐳']
+  const orbitdb = new OrbitDB(ipfs, userId)
+  const db = orbitdb.eventlog("|orbit-db|examples|eventlog-example")
 
-    const query = () => {
+  const creatures = ['🐙', '🐬', '🐋', '🐠', '🐡', '🦀', '🐢', '🐟', '🐳']
 
-      const index = Math.floor(Math.random() * creatures.length)
-      console.log("putting values in")
-      db.put(userId, { avatar: creatures[index], updated: 50})
-        .then(() => {
-          console.log("value has been put")
-          const user = db.get(userId)
-          let output = `\n`
-          output += `----------------------\n`
-          output += `User\n`
-          output += `----------------------\n`
-          output += `Id: ${userId}\n`
-          output += `Avatar: ${user.avatar}\n`
-          output += `Updated: ${user.updated}\n`
-          output += `----------------------`
-          console.log(output)
-        })
-        .catch((e) => {
-          console.error(e.stack)
-          console.log(e)
-        })
-    }
+  const query = () => {
+    const index = Math.floor(Math.random() * creatures.length)
+    db.put(userId, { avatar: creatures[index], updated: new Date().getTime() })
+      .then(() => {
+        const user = db.get(userId)
+        let output = `\n`
+        output += `----------------------\n`
+        output += `User\n`
+        output += `----------------------\n`
+        output += `Id: ${userId}\n`
+        output += `Avatar: ${user.avatar}\n`
+        output += `Updated: ${user.updated}\n`
+        output += `----------------------`
+        console.log(output)
+      })
+      .catch((e) => {
+        console.error(e.stack)
+      })
+  }
 
-    setInterval(query, 1000)
-  })
-  .catch((err) => console.error(err))
+  setInterval(query, 1000)
+})

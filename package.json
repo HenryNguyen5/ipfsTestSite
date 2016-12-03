@@ -31,6 +31,7 @@
     "webpack": "^1.13.3"
   },
   "dependencies": {
+    "electron": "^1.4.10",
     "ipfs-daemon": "^0.3.0-beta.3",
     "orbit-db": "^0.16.0-beta.1"
   }

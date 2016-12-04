@@ -1,27 +1,28 @@
-window.onload = () =>{
-  var dropzone = document.getElementById('dropzone');
-  dropzone.ondrop = function(e) {
-    console.log("file dropped")
+const path = require('path')
+window.onload = () => {
+    var dropzone = document.getElementById('dropzone');
+    dropzone.ondrop = function(e) {
 
-    var length = e.dataTransfer.items.length;
-    for (var i = 0; i < length; i++) {
-      var entry = e.dataTransfer.items[i].webkitGetAsEntry();
-      console.log(entry)
-      if (entry.isFile) {
+        console.log("File dropped:", e.dataTransfer.files[0].path)
+        var length = e.dataTransfer.items.length;
+        for (var i = 0; i < length; i++) {
+            var entry = e.dataTransfer.items[i].webkitGetAsEntry();
 
-      } else if (entry.isDirectory) {
 
-      }
+            if (entry.isFile) {
+
+            } else if (entry.isDirectory) {
+
+            }
+        }
+    };
+
+    document.ondragover = document.ondrop = (ev) => {
+        ev.preventDefault()
     }
-  };
 
-  document.ondragover = document.ondrop = (ev) => {
-    ev.preventDefault()
-  }
-
-  document.body.ondrop = (ev) => {
-    console.log(ev.dataTransfer.files[0].path)
-    ev.preventDefault()
-  }
+    document.body.ondrop = (ev) => {
+        ev.preventDefault()
+    }
 
 }
